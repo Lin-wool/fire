@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+    
+    
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+         <layout class="ch.qos.logback.classic.PatternLayout">
+			 <Pattern>
+			   %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{80} - %msg%n
+			 </Pattern>
+         </layout>  
+    </appender>
+
+
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+	     <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+	     <Prudent>true</Prudent> 
+		 <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> 
+			  <FileNamePattern>
+			   ./log/${appName}.%d{yyyy-MM-dd}.log
+			  </FileNamePattern>
+			  <MaxHistory>10</MaxHistory>
+		 </rollingPolicy>
+	     <layout class="ch.qos.logback.classic.PatternLayout">
+			  <Pattern>
+			   %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{80} - %msg%n
+			  </Pattern>
+	     </layout>
+	</appender>
+
+
+	<!-- TRACE DEBUG INFO WARN ERROR -->
+	<root level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="file" />
+	</root>
+	
+</configuration>
