@@ -6,21 +6,9 @@
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
 				</el-form-item>
-
+				
 				<el-form-item>
-					<el-input v-model="filters.searchMaintain" placeholder="请输入维护管理人员名称"></el-input>
-				</el-form-item>
-
-				<el-form-item>
-					<el-input v-model="filters.searchAccount" placeholder="请输入维护人员名称"></el-input>
-				</el-form-item>
-
-				<el-form-item>
-					<el-input v-model="filters.searchPosition" placeholder="请输入园区位置"></el-input>
-				</el-form-item>
-
-				<el-form-item>
-					<el-input v-model="filters.searchName" placeholder="请输入园区名称"></el-input>
+					<el-input v-model="filters.searchName" placeholder="请输入楼宇名称或编号"></el-input>
 				</el-form-item>
 
 				<el-form-item>
@@ -37,9 +25,9 @@
 
 			<el-table-column  type="selection" width="55" prop='id'></el-table-column>
 
-			<el-table-column prop="name" label="园区名称"  ></el-table-column>
+			<el-table-column prop="name" label="楼宇名称或编号"  ></el-table-column>
 
-			<el-table-column prop="position" label="位置"  ></el-table-column>
+			<el-table-column prop="floorCount" label="楼层数"  ></el-table-column>
 
 			<el-table-column prop="maintain" label="所属维保"  ></el-table-column>
 			
@@ -51,6 +39,7 @@
 				<template slot-scope="scope" >
                     <el-button-group >
 						<el-button type="primary" size="small" @click="handleDelete(scope.row)">删除</el-button>
+						<el-button type="primary" size="small" @click="handeEdit(scope.row)">修改</el-button>
                      </el-button-group>
 				</template>
 			</el-table-column>
@@ -70,16 +59,12 @@
 		<el-dialog title="编辑" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm">
 
-				<el-form-item label="园区名称" prop="name">
+				<el-form-item label="楼宇名称或编号" prop="name">
 					<el-input v-model="addForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 
-				<el-form-item label="位置" prop="position">
-					<el-input v-model="addForm.position" auto-complete="off"></el-input>
-				</el-form-item>
-
-				<el-form-item label="坐标" prop="coordinate">
-					<el-input v-model="addForm.coordinate" auto-complete="off"></el-input>
+				<el-form-item label="楼层数" prop="floorCount">
+					<el-input v-model="addForm.floorCount" auto-complete="off"></el-input>
 				</el-form-item>
 
 				<el-form-item label="所属维保管理员" prop="maintain">
@@ -90,7 +75,7 @@
 					<el-input v-model="addForm.account" auto-complete="off"></el-input>
 				</el-form-item>
 
-				<el-form-item label="园区描述" prop="description">
+				<el-form-item label="楼宇描述" prop="description">
 					<el-input v-model="addForm.description" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
@@ -132,11 +117,8 @@
                     name: [
 						{ required:true, message: '请输入园区名称', trigger: 'blur' },
 					],
-					position: [
-						{ required:true, message: '请输入园区所在位置', trigger: 'blur' },
-					],
-					coordinate: [
-						{ required:true, message: '请输入园区坐标', trigger: 'blur' },
+					floorCount: [
+						{ required:true, message: '请输入楼层数', trigger: 'blur' },
 					],
 					maintain: [
 						{ required:true, message: '请选择维保管理员', trigger: 'blur' },
@@ -150,30 +132,12 @@
 				},
 				addForm: {
 					name:'',
-					position:'',
-					coordinate:'',
+					floorCount:'',
 					maintain:'',
 					account:'',
                     description:''
 				},
 
-			}
-		},
-		filters:{
-			types(status){
-				return status==1 ? 'NB' : '4G';
-			},
-			gateways(status){
-				if(status==1){
-					return '移动';
-				}else if(status == 2){
-					return '联通';
-				}else{
-					return '电信';
-				}
-			},
-			cardStatus(status){
-				return status==0 ? '正常' : '不可用';
 			}
 		},
 		methods: {
@@ -187,13 +151,15 @@
 				this.search();
 			},
 
-			// 获取园区列表
+			// 获取楼宇列表
 			search() {
 				let param = {
                     pageIndex: this.pageIndex,
                     pageSize:this.pageSize,
                     searchName: this.filters.searchName,
-					
+					searchMaintain:this.filters.searchMaintain,
+					searchAccount:this.filters.searchAccount,
+					searchPosition:this.filters.searchPosition
 				};
                 
                 post('park/list',param).then(result=>{
@@ -207,15 +173,19 @@
 				this.addFormVisible = true;
 				this.addForm = {
 					name:'',
-					position:'',
-					coordinate:'',
+					floorCount:'',
 					maintain:'',
 					account:'',
                     description:''
 				};
             },
+			// 显示编辑页面
+			handeEdit(row){
+				this.addFormVisible = true;
+				this.addForm = Object.assign({}, row);
+			},
 			
-			// 删除园区
+			// 删除
 			handleDelete(row) {
 				this.$confirm('确认删除SIM卡吗?', '提示', {
 					type: 'warning'
@@ -233,7 +203,7 @@
 				});
 			},
 
-			// 批量删除园区
+			// 批量删除
 			batchDelete(){
 				let ids = [];
 				this.multipleSelection.forEach(s => ids.push(s.id));
@@ -281,7 +251,6 @@
 		},
 		mounted() {
 			this.search();
-			console.log(util.getFromSession("sysUser"));
 		}
 	}
 

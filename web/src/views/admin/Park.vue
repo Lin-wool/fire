@@ -140,10 +140,10 @@
 						{ required:true, message: '请输入园区坐标', trigger: 'blur' },
 					],
 					maintain: [
-						{ required:true, message: '请选择维保管理员', trigger: 'blur' },
+						{ required:false, message: '请选择维保管理员', trigger: 'blur' },
 					],
 					account: [
-						{ required:true, message: '请选择维保人员', trigger: 'blur' },
+						{ required:false, message: '请选择维保人员', trigger: 'blur' },
 					],
 					description: [
 						{ required:false, message: '请输入园区描述', trigger: 'blur' },
@@ -158,23 +158,6 @@
                     description:''
 				},
 
-			}
-		},
-		filters:{
-			types(status){
-				return status==1 ? 'NB' : '4G';
-			},
-			gateways(status){
-				if(status==1){
-					return '移动';
-				}else if(status == 2){
-					return '联通';
-				}else{
-					return '电信';
-				}
-			},
-			cardStatus(status){
-				return status==0 ? '正常' : '不可用';
 			}
 		},
 		methods: {
@@ -217,7 +200,7 @@
                     description:''
 				};
             },
-			// 修改园区信息
+			// 显示编辑页面
 			handeEdit(row){
 				this.addFormVisible = true;
 				this.addForm = Object.assign({}, row);
